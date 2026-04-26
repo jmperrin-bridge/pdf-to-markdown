@@ -1,0 +1,33 @@
+name: PDF to Markdown
+
+on:
+  push:
+    paths:
+      - "pdfs/**.pdf"
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Installer les dépendances
+        run: pip install -r requirements.txt
+
+      - name: Convertir les PDFs
+        run: python convert.py
+
+      - name: Commit et push les fichiers Markdown
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add markdown/
+          git diff --cached --quiet || git commit -m "chore: conversion automatique PDF → Markdown"
+          git push
